@@ -24,7 +24,7 @@ public class Snake implements KeyListener{
         g.setColor(Color.BLACK);
         g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE,Variables.TILE_SIZE);
         g.setColor(color);
-        g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-2,Variables.TILE_SIZE-2);
+        g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-4,Variables.TILE_SIZE-4);
     }
     
     public void createBody(Graphics g){
@@ -37,7 +37,7 @@ public class Snake implements KeyListener{
         g.setColor(color);
         if (!bodyTile.isEmpty()) {
             for (Tile body : bodyTile) {
-                g.fillRect(body.getPosX()*Variables.TILE_SIZE, body.getPosY()*Variables.TILE_SIZE, Variables.TILE_SIZE-2, Variables.TILE_SIZE-2);
+                g.fillRect(body.getPosX()*Variables.TILE_SIZE, body.getPosY()*Variables.TILE_SIZE, Variables.TILE_SIZE-4, Variables.TILE_SIZE-4);
             }
         }
     }

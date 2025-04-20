@@ -14,12 +14,14 @@ public class GeneralScore extends JPanel{
     private int bonus;
     private int malus;
     private int totalPoints;
+    private boolean  status;
 
-    public GeneralScore(int apples,int bonus,int malus){
+    public GeneralScore(int apples,int bonus,int malus,boolean status){
         this.apples = apples;
         this.bonus = bonus;
         this.malus = malus;
         this.totalPoints = apples + bonus + malus;
+        this.status = status;
         setBackground(Color.GRAY);
         setPreferredSize(new Dimension(300, 300));
         setLayout(new GridBagLayout());
@@ -35,7 +37,14 @@ public class GeneralScore extends JPanel{
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 1;
         constraints.weighty = 1;
-
+        JLabel lblstatus;
+        if (status) {
+            lblstatus = new JLabel("TU HAI VINTO ");
+            lblstatus.setFont(font);
+        }else{
+            lblstatus = new JLabel("TU HAI PERSO ");
+            lblstatus.setFont(font);
+        }
         JLabel lblMela = new JLabel("MELE: " + apples);
         lblMela.setFont(font);
         JLabel lblBonus = new JLabel("BONUS: "+bonus);
@@ -47,17 +56,19 @@ public class GeneralScore extends JPanel{
 
         JButton button = new JButton("Giocare di nuovo");
         button.setPreferredSize(new Dimension(240,50));
-
         
+
         constraints.gridy=0;
-        add(lblMela,constraints);
+        add(lblstatus,constraints);
         constraints.gridy=1;
-        add(lblBonus,constraints);
+        add(lblMela,constraints);
         constraints.gridy=2;
-        add(lblMalus,constraints);
+        add(lblBonus,constraints);
         constraints.gridy=3;
-        add(lblTotal,constraints);
+        add(lblMalus,constraints);
         constraints.gridy=4;
+        add(lblTotal,constraints);
+        constraints.gridy=5;
         add(button,constraints);
 
         button.addActionListener((actionEvent) -> {

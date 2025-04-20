@@ -9,6 +9,8 @@ import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,19 +20,22 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-public class RenderGame extends JPanel implements ActionListener {
+public class RenderGame extends JPanel implements ActionListener,KeyListener {
 
     private Snake snake;
     Timer gameLoop;
     private int scoreMela;
     private int scoreBonus;
     private int scoreMalus;
+    private int totalPoints;
+    private boolean  status;
     private Food apple, star;
     private boolean gameOver;
     List<Food> listFood;
     List<Food> listDanger;
     Random random;
     public RenderGame() {
+        this.status=false;
         listFood = new ArrayList<>();
         listDanger = new ArrayList<>();
         setLayout(new BorderLayout());
@@ -47,6 +52,8 @@ public class RenderGame extends JPanel implements ActionListener {
         listFood.addAll(listDanger);
         gameLoop = new Timer(100, this);
         gameLoop.start();
+        addKeyListener(this);
+        setFocusable(true); 
     }
 
     public void createSnake() {
@@ -75,7 +82,7 @@ public class RenderGame extends JPanel implements ActionListener {
                 listDanger.clear();
             }
             for (int i=0 ;i<randomNumber;i++) {
-                Food danger = new Food(30, 30, "Danger", -10);
+                Food danger = new Food(30, 30, "Danger", -5);
                 createFood(danger);
                 listDanger.add(danger);
             }
@@ -112,13 +119,15 @@ public class RenderGame extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
-        for (int i = 0; i < Variables.SIZE / Variables.TILE_SIZE; i++) {
+        /*
+         for (int i = 0; i < Variables.SIZE / Variables.TILE_SIZE; i++) {
             //rect (x0,y0) -> (x1-y1)
             //Colonne
             g.drawLine(i * Variables.TILE_SIZE, 0, i * Variables.TILE_SIZE, Variables.SIZE);
             //file
             g.drawLine(0, i * Variables.TILE_SIZE, Variables.SIZE, i * Variables.TILE_SIZE);
         }
+         */
 
         snake.createHead(g);
         snake.createBody(g);
@@ -137,18 +146,20 @@ public class RenderGame extends JPanel implements ActionListener {
     }
 
     public void eatFood() {
+        //Cui mangiamo la mela
         if (collision(snake.getHead(), apple.getFood())) {
             scoreMela += apple.getPoints();
             snake.getBodyTile().add(apple.getFood());
             createApple();
         }
+        //Cui mangiamo la stella
         if (star != null) {
             if (collision(snake.getHead(),star.getFood())) {
                 scoreBonus += star.getPoints();
-                snake.getBodyTile().remove(snake.getBodyTile().size()-1);
                 this.star=null;
             }
         }
+        //Se non e vuoto , possiamo mangiare anche il frutto avvelenato
         if (!listDanger.isEmpty()) {
             for(int i=0;i<listDanger.size();i++){
                 if (collision(snake.getHead(), listDanger.get(i).getFood())) {
@@ -164,6 +175,7 @@ public class RenderGame extends JPanel implements ActionListener {
         }
     }
 
+    //Conteggio dei punti 
     public void scorePaint(Graphics g) {
         g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.setColor(Color.green);
@@ -171,6 +183,9 @@ public class RenderGame extends JPanel implements ActionListener {
 
         g.setColor(Color.YELLOW);
         g.drawString("Bonus Points:" + scoreBonus, Variables.TILE_SIZE * 15, Variables.TILE_SIZE);
+
+        g.setColor(Color.WHITE);
+        g.drawString("Total Points:" + totalPoints, Variables.TILE_SIZE * 5, Variables.TILE_SIZE);
     }
 
     public boolean collision(Tile start, Tile target) {
@@ -188,14 +203,21 @@ public class RenderGame extends JPanel implements ActionListener {
                 || snake.getHead().getPosX() < 0 || snake.getHead().getPosY() < 0) {
             this.gameOver = true;
         }
+        totalPoints= scoreMela + scoreBonus +scoreMalus;
+        
+        if (totalPoints>=50) {
+            gameOver=true;
+            status=true;
+        }
+
         if (this.gameOver) {
             gameLoop.stop();
-
+            
             //Otteniamo il frame padre di questo pannello
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
             //Rimuoviamo il pannello attuale 
             frame.remove(this);
-            GeneralScore generalScore = new GeneralScore(scoreMela, scoreBonus, scoreMalus);
+            GeneralScore generalScore = new GeneralScore(scoreMela, scoreBonus, scoreMalus,status);
             frame.add(generalScore);
             frame.revalidate();
             frame.repaint();
@@ -255,4 +277,24 @@ public class RenderGame extends JPanel implements ActionListener {
 
         repaint();
     }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE){
+            gameLoop.stop();
+        }else{
+            gameLoop.start();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+    
 }
