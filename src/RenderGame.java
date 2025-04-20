@@ -58,7 +58,7 @@ public class RenderGame extends JPanel implements ActionListener {
     }
 
     public void createStar() {
-        Timer timer2 = new Timer(5000, (ActionEvent e) -> {
+        Timer timer2 = new Timer(10000, (ActionEvent e) -> {
             star = new Food(30, 30, "star", 10);
             createFood(star);
         });
@@ -119,12 +119,22 @@ public class RenderGame extends JPanel implements ActionListener {
             snake.getBodyTile().add(apple.getFood());
             createApple();
         }
+        if (star != null) {
+            if (collision(snake.getHead(),star.getFood())) {
+                scoreBonus += star.getPoints();
+                snake.getBodyTile().remove(snake.getBodyTile().size()-1);
+                this.star=null;
+            }
+        }
     }
 
     public void scorePaint(Graphics g) {
         g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.setColor(Color.green);
         g.drawString("Mele Mangiate:" + scoreMela, Variables.TILE_SIZE * 25, Variables.TILE_SIZE);
+
+        g.setColor(Color.YELLOW);
+        g.drawString("Bonus Points:" + scoreBonus, Variables.TILE_SIZE * 15, Variables.TILE_SIZE);
     }
 
     public boolean collision(Tile start, Tile target) {
@@ -134,7 +144,6 @@ public class RenderGame extends JPanel implements ActionListener {
     public void gameOverFunction() {
         for (Tile snakeTile : snake.getBodyTile()) {
             if (collision(snake.getHead(), snakeTile)) {
-                System.out.println("here");
                 this.gameOver = true;
             }
         }
