@@ -19,8 +19,6 @@ public class Food {
         food.setPosY(random.nextInt(Variables.SIZE/Variables.TILE_SIZE));
     }
 
-
-
     public Tile getFood() {
         return food;
     }

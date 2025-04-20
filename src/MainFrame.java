@@ -32,7 +32,7 @@ public class MainFrame {
         
         JButton button = new JButton("START!");
         button.setPreferredSize(new Dimension(120,50));
-
+        
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
         contentPanel.setBackground(new Color(128,128,255));

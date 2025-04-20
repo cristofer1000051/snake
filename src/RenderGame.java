@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,24 +25,26 @@ public class RenderGame extends JPanel implements ActionListener {
     private int scoreMela;
     private int scoreBonus;
     private int scoreMalus;
-
     private Food apple, star;
     private boolean gameOver;
     List<Food> listFood;
-
+    List<Food> listDanger;
+    Random random;
     public RenderGame() {
         listFood = new ArrayList<>();
+        listDanger = new ArrayList<>();
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(Variables.SIZE, Variables.SIZE));
         setBackground(Color.BLACK);
-
+        this.random= new Random();
         createSnake();
         createApple();
         createStar();
+        createDanger();
 
         listFood.add(apple);
         listFood.add(star);
-
+        listFood.addAll(listDanger);
         gameLoop = new Timer(100, this);
         gameLoop.start();
     }
@@ -62,8 +65,23 @@ public class RenderGame extends JPanel implements ActionListener {
             star = new Food(30, 30, "star", 10);
             createFood(star);
         });
-
         timer2.start();
+    }
+    public void createDanger(){
+        int min=15;
+        int randomNumber= random.nextInt(30 - min) + min;
+        Timer timer3 = new Timer(10000, (ActionEvent e) -> {
+            if (listDanger.size()>=randomNumber) {
+                listDanger.clear();
+            }
+            for (int i=0 ;i<randomNumber;i++) {
+                Food danger = new Food(30, 30, "Danger", -10);
+                createFood(danger);
+                listDanger.add(danger);
+            }
+            
+        });
+        timer3.start();
     }
 
     //In questo caso, creiamo una funzione che chiamerà il metodo di tipo food
@@ -109,6 +127,11 @@ public class RenderGame extends JPanel implements ActionListener {
         if (star != null) {
             paintStar(g);
         }
+        if (!listDanger.isEmpty()) {
+            for (Food d : listDanger) {
+                paintDanger(g,d);
+            }
+        }
 
         scorePaint(g);
     }
@@ -124,6 +147,19 @@ public class RenderGame extends JPanel implements ActionListener {
                 scoreBonus += star.getPoints();
                 snake.getBodyTile().remove(snake.getBodyTile().size()-1);
                 this.star=null;
+            }
+        }
+        if (!listDanger.isEmpty()) {
+            for(int i=0;i<listDanger.size();i++){
+                if (collision(snake.getHead(), listDanger.get(i).getFood())) {
+                    scoreMalus +=listDanger.get(i).getPoints(); 
+                    listDanger.remove(i);
+                    if (!snake.getBodyTile().isEmpty()) {
+                        snake.getBodyTile().remove(snake.getBodyTile().size()-1);
+                    }else{
+                        gameOver=true;
+                    }
+                }
             }
         }
     }
@@ -205,6 +241,10 @@ public class RenderGame extends JPanel implements ActionListener {
         g.drawImage(scaledImage, star.getFood().getPosX() * Variables.TILE_SIZE, star.getFood().getPosY() * Variables.TILE_SIZE, null);
     }
 
+    public void paintDanger(Graphics g,Food danger){
+        g.setColor(Color.red);
+        g.fillRect(danger.getFood().getPosX()*Variables.TILE_SIZE, danger.getFood().getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-2,Variables.TILE_SIZE-2);
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         snake.move();
