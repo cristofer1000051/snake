@@ -1,0 +1,111 @@
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Snake implements KeyListener{
+    private Tile head;
+    private List<Tile> bodyTile;
+    private int dirX;
+    private int dirY;
+    private Color color;
+    
+    public Snake(int posX,int posY,Color color){
+        this.head= new Tile(posX, posY);
+        this.bodyTile = new ArrayList<>();
+        this.dirX = 0;
+        this.dirY = 0;
+        this.color= color;
+    }
+    public void createHead(Graphics g){
+        g.setColor(color);
+        g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE,Variables.TILE_SIZE);
+    }
+    public void createBody(Graphics g){
+        g.setColor(color);
+        if (!bodyTile.isEmpty()) {
+            for (Tile body : bodyTile) {
+                g.fillRect(body.getPosX()*Variables.TILE_SIZE, body.getPosY()*Variables.TILE_SIZE, Variables.TILE_SIZE, Variables.TILE_SIZE);
+            }
+        }
+    }
+    public void move(){
+        
+        moveBody();
+        head.increasePosX(dirX);
+        head.increasePosY(dirY);
+    }
+    public void moveBody(){
+        if (!bodyTile.isEmpty()) {
+            
+            for (int i=bodyTile.size()-1;i>=0;i--) {
+                Tile lasTile = bodyTile.get(i);
+                if (i==0) {
+                    System.out.println("Siamo dentro");
+                    bodyTile.get(0).setPosX(head.getPosX());
+                    bodyTile.get(0).setPosY(head.getPosY());
+                }else{
+                    lasTile.setPosX(bodyTile.get(i-1).getPosX());
+                    lasTile.setPosY(bodyTile.get(i-1).getPosY());
+                }
+                
+            }
+        }
+    }
+    @Override
+    public void keyTyped(KeyEvent e) {}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
+                if (dirY != 1) {
+                    dirX = 0;
+                    dirY = -1;
+                }
+                break;
+            case KeyEvent.VK_DOWN:
+                if (dirY !=-1) {
+                    dirX = 0;
+                    dirY = 1;
+                }
+                break;
+            case KeyEvent.VK_LEFT:
+                if(dirX!=1){
+                    dirX = -1;
+                    dirY = 0;
+                }
+                break;
+            case KeyEvent.VK_RIGHT:
+                if (dirX!=-1) {
+                    dirX = 1;
+                    dirY=0;
+                }
+                break;
+            default:
+                System.out.println("");
+                break;
+        }
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    public List<Tile> getBodyTile() {
+        return bodyTile;
+    }
+
+    public void setBodyTile(List<Tile> bodyTile) {
+        this.bodyTile = bodyTile;
+    }
+
+    public Tile getHead() {
+        return head;
+    }
+
+    public void setHead(Tile head) {
+        this.head = head;
+    }
+
+}
