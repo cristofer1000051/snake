@@ -21,19 +21,27 @@ public class Snake implements KeyListener{
         this.color= color;
     }
     public void createHead(Graphics g){
-        g.setColor(color);
+        g.setColor(Color.BLACK);
         g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE,Variables.TILE_SIZE);
-    }
-    public void createBody(Graphics g){
         g.setColor(color);
+        g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-2,Variables.TILE_SIZE-2);
+    }
+    
+    public void createBody(Graphics g){
+        g.setColor(Color.BLACK);
         if (!bodyTile.isEmpty()) {
             for (Tile body : bodyTile) {
                 g.fillRect(body.getPosX()*Variables.TILE_SIZE, body.getPosY()*Variables.TILE_SIZE, Variables.TILE_SIZE, Variables.TILE_SIZE);
             }
         }
+        g.setColor(color);
+        if (!bodyTile.isEmpty()) {
+            for (Tile body : bodyTile) {
+                g.fillRect(body.getPosX()*Variables.TILE_SIZE, body.getPosY()*Variables.TILE_SIZE, Variables.TILE_SIZE-2, Variables.TILE_SIZE-2);
+            }
+        }
     }
     public void move(){
-        
         moveBody();
         head.increasePosX(dirX);
         head.increasePosY(dirY);
@@ -44,14 +52,12 @@ public class Snake implements KeyListener{
             for (int i=bodyTile.size()-1;i>=0;i--) {
                 Tile lasTile = bodyTile.get(i);
                 if (i==0) {
-                    System.out.println("Siamo dentro");
                     bodyTile.get(0).setPosX(head.getPosX());
                     bodyTile.get(0).setPosY(head.getPosY());
                 }else{
                     lasTile.setPosX(bodyTile.get(i-1).getPosX());
                     lasTile.setPosY(bodyTile.get(i-1).getPosY());
                 }
-                
             }
         }
     }
