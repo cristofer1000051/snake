@@ -17,14 +17,14 @@ public class MainFrame {
 
     final Font mainFont = new Font("Segoe print", Font.BOLD, 18);
 
-    private RenderGame rendering;
+    private JFrame frame;
 
     public MainFrame() {
-        this.rendering = new RenderGame();
+        
     }
 
     public void initialize() {
-        JFrame frame = new JFrame("Menu");
+        this.frame = new JFrame("Menu");
        
         frame.setSize(Variables.SIZE, Variables.SIZE);
         frame.setResizable(false);
@@ -34,7 +34,7 @@ public class MainFrame {
         lblTitle.setFont(new Font("Segoe print", Font.BOLD, 52));
         lblTitle.setForeground(Color.WHITE);
         
-        JLabel author = new JLabel("Made: By Cristofer");
+        JLabel author = new JLabel("Made By Cristofer");
         author.setFont(new Font("Segoe print", Font.BOLD, 12));
         author.setForeground(Color.WHITE);
 
@@ -72,6 +72,7 @@ public class MainFrame {
         frame.add(contentPanel);
 
         button.addActionListener((ActionEvent e) -> {
+            RenderGame rendering = new RenderGame(this.frame);
             frame.remove(contentPanel);
             frame.invalidate();
             frame.add(rendering);
