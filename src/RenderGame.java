@@ -214,7 +214,7 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
                 gameOver=true;
             }
         }
-        if (snake_1.getHead() == snake_2.getHead()) {
+        if (collision(snake_1.getHead() ,snake_2.getHead())) {
             gameOver=true;
         }
     }
