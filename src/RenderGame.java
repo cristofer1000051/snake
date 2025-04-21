@@ -17,12 +17,11 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class RenderGame extends JPanel implements ActionListener,KeyListener {
 
-    private Snake snake;
+    private Snake snake_1,snake_2;
     Timer gameLoop;
     private int scoreMela;
     private int scoreBonus;
@@ -34,8 +33,10 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     List<Food> listFood;
     List<Food> listDanger;
     Random random;
-    public RenderGame() {
+    private JFrame frame; 
+    public RenderGame(JFrame frame) {
         this.status=false;
+        this.frame = frame;
         listFood = new ArrayList<>();
         listDanger = new ArrayList<>();
         setLayout(new BorderLayout());
@@ -57,9 +58,11 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     }
 
     public void createSnake() {
-        snake = new Snake(5, 5, Color.GREEN);
-        addKeyListener(snake);
-        setFocusable(true);
+        snake_1 = new Snake(5, 5, Color.GREEN,1);
+        addKeyListener(snake_1);
+        snake_2 = new Snake(5,15,Color.RED,2);
+        addKeyListener(snake_2);
+
     }
 
     public void createApple() {
@@ -104,7 +107,7 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
                     }
                 }
             }
-            for (Tile body: snake.getBodyTile() ) {
+            for (Tile body: snake_1.getBodyTile() ) {
                 if (collision(body,food.getFood())) {
                     createFood(food);
                 }
@@ -129,8 +132,8 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
         }
          */
 
-        snake.createHead(g);
-        snake.createBody(g);
+        snake_1.createHead(g);
+        snake_1.createBody(g);
 
         paintApple(g);
         if (star != null) {
@@ -147,14 +150,14 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
 
     public void eatFood() {
         //Cui mangiamo la mela
-        if (collision(snake.getHead(), apple.getFood())) {
+        if (collision(snake_1.getHead(), apple.getFood())) {
             scoreMela += apple.getPoints();
-            snake.getBodyTile().add(apple.getFood());
+            snake_1.getBodyTile().add(apple.getFood());
             createApple();
         }
         //Cui mangiamo la stella
         if (star != null) {
-            if (collision(snake.getHead(),star.getFood())) {
+            if (collision(snake_1.getHead(),star.getFood())) {
                 scoreBonus += star.getPoints();
                 this.star=null;
             }
@@ -162,11 +165,11 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
         //Se non e vuoto , possiamo mangiare anche il frutto avvelenato
         if (!listDanger.isEmpty()) {
             for(int i=0;i<listDanger.size();i++){
-                if (collision(snake.getHead(), listDanger.get(i).getFood())) {
+                if (collision(snake_1.getHead(), listDanger.get(i).getFood())) {
                     scoreMalus +=listDanger.get(i).getPoints(); 
                     listDanger.remove(i);
-                    if (!snake.getBodyTile().isEmpty()) {
-                        snake.getBodyTile().remove(snake.getBodyTile().size()-1);
+                    if (!snake_1.getBodyTile().isEmpty()) {
+                        snake_1.getBodyTile().remove(snake_1.getBodyTile().size()-1);
                     }else{
                         gameOver=true;
                     }
@@ -193,14 +196,14 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     }
 
     public void gameOverFunction() {
-        for (Tile snakeTile : snake.getBodyTile()) {
-            if (collision(snake.getHead(), snakeTile)) {
+        for (Tile body : snake_1.getBodyTile()) {
+            if (collision(snake_1.getHead(), body)) {
                 this.gameOver = true;
             }
         }
-        if (snake.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake.getHead().getPosX() < 0 || snake.getHead().getPosY() < 0) {
+        if (snake_1.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake_1.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake_1.getHead().getPosX() < 0 || snake_1.getHead().getPosY() < 0) {
             this.gameOver = true;
         }
         totalPoints= scoreMela + scoreBonus +scoreMalus;
@@ -212,15 +215,16 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
 
         if (this.gameOver) {
             gameLoop.stop();
-            
-            //Otteniamo il frame padre di questo pannello
-            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            //Rimuoviamo il pannello attuale 
-            frame.remove(this);
-            GeneralScore generalScore = new GeneralScore(scoreMela, scoreBonus, scoreMalus,status);
-            frame.add(generalScore);
-            frame.revalidate();
-            frame.repaint();
+            if (this.frame !=null) {
+                //Otteniamo il frame padre di questo pannello
+                //Rimuoviamo il pannello attuale 
+                frame.remove(this);
+                GeneralScore generalScore = new GeneralScore(scoreMela, scoreBonus, scoreMalus,status);
+                frame.invalidate();
+                frame.add(generalScore);
+                frame.revalidate();
+                frame.repaint();
+            }
         }
     }
 
@@ -269,7 +273,7 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        snake.move();
+        snake_1.move();
         //Si chiama questa funzione prima di mangiare la frutta, così eviti di , avere la testa e il tile succesivo
         //con la stessa posizione
         gameOverFunction();
