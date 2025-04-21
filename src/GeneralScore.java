@@ -39,10 +39,10 @@ public class GeneralScore extends JPanel{
         constraints.weighty = 1;
         JLabel lblstatus;
         if (status) {
-            lblstatus = new JLabel("TU HAI VINTO ");
+            lblstatus = new JLabel("HAI VINTO ");
             lblstatus.setFont(font);
         }else{
-            lblstatus = new JLabel("TU HAI PERSO ");
+            lblstatus = new JLabel("HAI PERSO ");
             lblstatus.setFont(font);
         }
         JLabel lblMela = new JLabel("MELE: " + apples);
