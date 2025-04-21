@@ -13,6 +13,7 @@ public class Snake implements KeyListener{
     private int dirY;
     private Color color;
     private int players;
+    
     public Snake(int posX,int posY,Color color,int players){
         this.head= new Tile(posX, posY);
         this.bodyTile = new ArrayList<>();

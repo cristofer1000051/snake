@@ -60,7 +60,8 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     public void createSnake() {
         snake_1 = new Snake(5, 5, Color.GREEN,1);
         addKeyListener(snake_1);
-        snake_2 = new Snake(5,15,Color.RED,2);
+
+        snake_2 = new Snake(5,15,Color.BLUE,2);
         addKeyListener(snake_2);
 
     }
@@ -112,6 +113,11 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
                     createFood(food);
                 }
             }
+            for(Tile body: snake_2.getBodyTile()){
+                if (collision(body,food.getFood())) {
+                    createFood(food);
+                }
+            }
         }
     }
 
@@ -135,6 +141,9 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
         snake_1.createHead(g);
         snake_1.createBody(g);
 
+        snake_2.createHead(g);
+        snake_2.createBody(g);
+
         paintApple(g);
         if (star != null) {
             paintStar(g);
@@ -148,16 +157,16 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
         scorePaint(g);
     }
 
-    public void eatFood() {
+    public void eatFood(Snake snake) {
         //Cui mangiamo la mela
-        if (collision(snake_1.getHead(), apple.getFood())) {
+        if (collision(snake.getHead(), apple.getFood())) {
             scoreMela += apple.getPoints();
-            snake_1.getBodyTile().add(apple.getFood());
+            snake.getBodyTile().add(apple.getFood());
             createApple();
         }
         //Cui mangiamo la stella
         if (star != null) {
-            if (collision(snake_1.getHead(),star.getFood())) {
+            if (collision(snake.getHead(),star.getFood())) {
                 scoreBonus += star.getPoints();
                 this.star=null;
             }
@@ -165,11 +174,11 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
         //Se non e vuoto , possiamo mangiare anche il frutto avvelenato
         if (!listDanger.isEmpty()) {
             for(int i=0;i<listDanger.size();i++){
-                if (collision(snake_1.getHead(), listDanger.get(i).getFood())) {
+                if (collision(snake.getHead(), listDanger.get(i).getFood())) {
                     scoreMalus +=listDanger.get(i).getPoints(); 
                     listDanger.remove(i);
-                    if (!snake_1.getBodyTile().isEmpty()) {
-                        snake_1.getBodyTile().remove(snake_1.getBodyTile().size()-1);
+                    if (!snake.getBodyTile().isEmpty()) {
+                        snake.getBodyTile().remove(snake.getBodyTile().size()-1);
                     }else{
                         gameOver=true;
                     }
@@ -194,16 +203,30 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     public boolean collision(Tile start, Tile target) {
         return start.getPosX() == target.getPosX() && start.getPosY() == target.getPosY();
     }
-
-    public void gameOverFunction() {
-        for (Tile body : snake_1.getBodyTile()) {
-            if (collision(snake_1.getHead(), body)) {
+    public void collisionSnakes(){
+        for(Tile tile :snake_1.getBodyTile()){
+            if (collision(snake_2.getHead(), tile)) {
+                gameOver=true;
+            }
+        }
+        for (Tile tile :snake_2.getBodyTile()) {
+            if(collision(snake_1.getHead(), tile)){
+                gameOver=true;
+            }
+        }
+        if (snake_1.getHead() == snake_2.getHead()) {
+            gameOver=true;
+        }
+    }
+    public void gameOverFunction(Snake snake) {
+        for (Tile body : snake.getBodyTile()) {
+            if (collision(snake.getHead(), body)) {
                 this.gameOver = true;
             }
         }
-        if (snake_1.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake_1.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake_1.getHead().getPosX() < 0 || snake_1.getHead().getPosY() < 0) {
+        if (snake.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake.getHead().getPosX() < 0 || snake.getHead().getPosY() < 0) {
             this.gameOver = true;
         }
         totalPoints= scoreMela + scoreBonus +scoreMalus;
@@ -274,11 +297,14 @@ public class RenderGame extends JPanel implements ActionListener,KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         snake_1.move();
+        snake_2.move();
         //Si chiama questa funzione prima di mangiare la frutta, così eviti di , avere la testa e il tile succesivo
         //con la stessa posizione
-        gameOverFunction();
-        eatFood();
-
+        gameOverFunction(snake_1);
+        gameOverFunction(snake_2);
+        eatFood(snake_1);
+        eatFood(snake_2);
+        collisionSnakes();
         repaint();
     }
 
