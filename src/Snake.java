@@ -45,6 +45,8 @@ public class Snake implements KeyListener{
         g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE,Variables.TILE_SIZE);
         g.setColor(color);
         g.fillRect(head.getPosX()*Variables.TILE_SIZE, head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-4,Variables.TILE_SIZE-4);
+        g.setColor(Color.darkGray);
+        g.fillRect(head.getPosX()*(Variables.TILE_SIZE), head.getPosY()*Variables.TILE_SIZE ,Variables.TILE_SIZE-15,Variables.TILE_SIZE-15);
     }
     
     public void createBody(Graphics g){
@@ -172,6 +174,9 @@ public class Snake implements KeyListener{
 
     public int getScoreMela() {
         return scoreMela;
+    }
+    public void setScoreMela(int scoreMela){
+        this.scoreMela=scoreMela;
     }
     public void subMela(int points){
         this.scoreMela= this.scoreMela-points;

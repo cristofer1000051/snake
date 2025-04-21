@@ -43,7 +43,7 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
         createStar();
         insertImage();
 
-        listFood.add(apple);
+        listFood.addAll(listApple);
         listFood.add(star);
         gameLoop = new Timer(100, this);
         gameLoop.start();
@@ -61,7 +61,7 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
     }
 
     public void createApple() {
-        apple = new Food(10, 10, "apple", 1,0);
+        apple = new Food(10, 10, "apple", 1, 0);
         listApple.add(apple);
         createFood(apple);
         createApples();
@@ -69,34 +69,35 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
 
     public void createStar() {
         Timer timer2 = new Timer(3000, (ActionEvent e) -> {
-            star = new Food(30, 30, "star", 1,3);
+            star = new Food(30, 30, "star", 1, 3);
             createFood(star);
         });
         timer2.start();
     }
 
-    public void createApples(){
-        int min=15;
-        int randomNumber= random.nextInt(30 - min) + min;
-        if (listApple.size()<randomNumber) {
-            for (int i=0 ;i<30;i++) {
-                Food ap = new Food(30, 30, "apple", 1,0);
+    public void createApples() {
+        int min = 15;
+        int randomNumber = random.nextInt(30 - min) + min;
+        if (listApple.size() < randomNumber) {
+            for (int i = 0; i < 30; i++) {
+                Food ap = new Food(30, 30, "apple", 1, 0);
                 createFood(ap);
                 listApple.add(ap);
             }
         }
         Timer timer3 = new Timer(3000, (ActionEvent e) -> {
-           if(listApple.size()<=30){
-                Food ap = new Food(30, 30, "apple", 1,0);
+            if (listApple.size() <= 30) {
+                Food ap = new Food(30, 30, "apple", 1, 0);
                 createFood(ap);
                 listApple.add(ap);
-           }
+            }
         });
         timer3.start();
     }
+
     //In questo caso, creiamo una funzione che chiamerà il metodo di tipo food
     //e verifica che non abbiano la stessa posizione nella griglia
-    //In caso contrario, si chimerà in modo ricorsivo
+    //In caso contrario, si chiamerà in modo ricorsivo
     public void createFood(Food food) {
         food.create();
         if (!listFood.isEmpty()) {
@@ -142,7 +143,7 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
 
         snake_2.createHead(g);
         snake_2.createBody(g);
-        
+
         paintApple(g);
         if (star != null) {
             paintStar(g);
@@ -153,14 +154,15 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
 
     public void eatFood(Snake snake) {
         //Cui mangiamo la mela
-        for (int i=0;i<listApple.size();i++) {
+        for (int i = 0; i < listApple.size(); i++) {
             if (collision(snake.getHead(), listApple.get(i).getFood())) {
                 snake.addScoreMela(listApple.get(i).getPoints());
                 snake.getBodyTile().add(listApple.get(i).getFood());
                 listApple.remove(i);
+                
             }
         }
-        
+
     }
 
     public void eatStar(Snake snake1, Snake snake2) {
@@ -203,20 +205,44 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
     public void collisionSnakes() {
         for (Tile tile : snake_1.getBodyTile()) {
             if (collision(snake_2.getHead(), tile)) {
-                gameOver = true;
-
+                convertSnakeToApple(snake_2);
+                resetPositionSnake2();
             }
         }
         for (Tile tile : snake_2.getBodyTile()) {
             if (collision(snake_1.getHead(), tile)) {
-                gameOver = true;
+                convertSnakeToApple(snake_1);
+                resetPositionSnake1();
             }
         }
+        
+        if(checkSelfCollition(snake_1)){
+            resetPositionSnake1();
+        }else if (checkSelfCollition(snake_2)) {
+            resetPositionSnake2();
+        }
+    }
+    public void checkHeadCollition(){
         if (collision(snake_1.getHead(), snake_2.getHead())) {
             resetPositionSnake1();
             resetPositionSnake2();
             gameLoop.stop();
         }
+    }
+    public boolean checkSelfCollition(Snake snake){
+        for(Tile tile:snake.getBodyTile()){
+            if(collision(snake.getHead(), tile)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public void convertSnakeToApple(Snake snake) {
+        for (Tile t : snake.getBodyTile()) {
+            apple = new Food(t.getPosX(), t.getPosY(), "apple", 1, 0);
+            listApple.add(apple);
+        }
+        
     }
 
     public void resetPositionSnake1() {
@@ -224,6 +250,7 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
         snake_1.getHead().setPosY(5);
         snake_1.setBodyTile(new ArrayList<>());
         snake_1.initializeBody(3);
+        snake_1.setScoreMela(0);
     }
 
     public void resetPositionSnake2() {
@@ -231,19 +258,12 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
         snake_2.getHead().setPosY(15);
         snake_2.setBodyTile(new ArrayList<>());
         snake_2.initializeBody(3);
+        snake_2.setScoreMela(0);
     }
 
-    public void gameOverFunction(Snake snake) {
-        for (Tile body : snake.getBodyTile()) {
-            if (collision(snake.getHead(), body)) {
-                resetPositionSnake1();
-            }
-        }
-        if (snake.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
-                || snake.getHead().getPosX() < 0 || snake.getHead().getPosY() < 0) {
-            this.gameOver = true;
-        }
+    public void gameOver(Snake snake) {
+       
+
         snake.setTotalPoints(snake.getScoreMela() + snake.getScoreBonus());
 
         if (snake.getTotalPoints() >= 10) {
@@ -266,6 +286,22 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    public boolean detectLimits(Snake snake) {
+        return snake.getHead().getPosX() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake.getHead().getPosY() >= Variables.SIZE / Variables.TILE_SIZE
+                || snake.getHead().getPosX() < 0 || snake.getHead().getPosY() < 0;
+
+    }
+
+    public void checkLimits(){
+        if (detectLimits(snake_1)) {
+            resetPositionSnake1();
+            
+        }
+        if (detectLimits(snake_2)) {
+            resetPositionSnake2();
+        }
+    }
     public void insertImage() {
         try {
             imageApple = new ImageIcon(getClass().getResource("./resources/apple.png")).getImage();
@@ -300,14 +336,19 @@ public class RenderGame extends JPanel implements ActionListener, KeyListener {
         //Si chiama questa funzione prima di mangiare la frutta, così eviti di , avere la testa e il tile succesivo
         //con la stessa posizione
 
-        gameOverFunction(snake_1);
-        gameOverFunction(snake_2);
 
+
+        checkLimits();
+        eatStar(snake_1, snake_2);
+        collisionSnakes();
         eatFood(snake_1);
         eatFood(snake_2);
 
-        collisionSnakes();
-        eatStar(snake_1, snake_2);
+        
+        
+        gameOver(snake_1);
+        gameOver(snake_2);
+        checkHeadCollition();
         repaint();
     }
 
