@@ -13,18 +13,29 @@ public class Snake implements KeyListener{
     private int dirY;
     private Color color;
     private int players;
+    private boolean  status;
     
-    public Snake(int posX,int posY,Color color,int players){
+    private int scoreMela;
+    private int scoreBonus;
+    private int totalPoints;
+    private String name;
+
+    public Snake(int posX,int posY,Color color,int players,String name){
         this.head= new Tile(posX, posY);
         this.bodyTile = new ArrayList<>();
         this.dirX = 0;
         this.dirY = 0;
         this.color= color;
         this.players = players;
+        this.name = name;
         this.initializeBody(3);
+        this.status=false;
         
     }
     public void initializeBody(int size){
+        //Resetiamo questi due valori
+        dirX=0;
+        dirY=0;
         for (int i=1;i<=size;i++) {
             bodyTile.add(new Tile(head.getPosX()-i, head.getPosY()));
         }
@@ -59,7 +70,6 @@ public class Snake implements KeyListener{
 
     }
     public void moveBody(){
-        
         if (!bodyTile.isEmpty()) {
             for (int i=bodyTile.size()-1;i>=0;i--) {
                 Tile lasTile = bodyTile.get(i);
@@ -108,7 +118,7 @@ public class Snake implements KeyListener{
                     System.out.println("");
                     break;
             }
-        }else if(players==2){
+        }else if(this.players==2){
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_W:
                     if (dirY != 1) {
@@ -160,4 +170,39 @@ public class Snake implements KeyListener{
         this.head = head;
     }
 
-}
+    public int getScoreMela() {
+        return scoreMela;
+    }
+    public void subMela(int points){
+        this.scoreMela= this.scoreMela-points;
+    }
+    public void addScoreMela(int mela){
+        this.scoreMela += mela;
+    }
+    public int getScoreBonus() {
+        return scoreBonus;
+    }
+    public void addScoreBonus(int scoreBonus){
+        this.scoreBonus += scoreBonus;
+    }
+    public int getTotalPoints() {
+        return totalPoints;
+    }
+
+    public void setTotalPoints(int totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+    
+}   

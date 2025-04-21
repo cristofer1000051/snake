@@ -6,12 +6,14 @@ public class Food {
     private String name;
     private Random random;
     private int points;
+    private int negativePoints;
 
-    public Food(int posX,int posY,String name,int points){
+    public Food(int posX,int posY,String name,int points,int negativePoints){
         this.food= new Tile(posX, posY);
         this.name=name;
         random= new Random();
         this.points=points;
+        this.negativePoints=negativePoints;
     }
 
     public void create(){
@@ -33,5 +35,8 @@ public class Food {
 
     public int getPoints() {
         return points;
+    }
+    public int getNegativePoints(){
+        return this.negativePoints;
     }
 }
